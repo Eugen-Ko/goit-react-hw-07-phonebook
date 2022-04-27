@@ -1,37 +1,34 @@
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { getItemsList, getFilterQuery } from 'redux/dataSelector';
+import { useFetchContactsQuery } from 'redux/Reducers/contactsApi';
 import { useParams, useNavigate } from 'react-router-dom';
 
 //------------------------------------------------------------------
 
-export const useHomeHook = () => {
+export const useHomeHook = filter => {
   const [list, setList] = useState([]);
-
   const navigate = useNavigate();
 
-  const contactList = useSelector(getItemsList);
-  const filter = useSelector(getFilterQuery);
+  const { data: contacts, isFetching } = useFetchContactsQuery();
 
   useEffect(() => {
     filter !== ''
       ? setList(
-          contactList.filter(({ name }) => name.toLowerCase().includes(filter))
+          contacts.filter(({ name }) => name.toLowerCase().includes(filter))
         )
-      : setList(contactList);
-  }, [contactList, filter]);
+      : setList(contacts);
+  }, [contacts, filter]);
 
-  useEffect(() => {}, [filter]);
   useEffect(() => {
     filter !== '' ? navigate(`?query=${filter}`) : navigate(`/`);
   }, [filter, navigate]);
-  return { filter, list };
+  console.log(contacts);
+  return { list, isFetching };
 };
 
 //-------------------------------------------------------------------
 
 export const useEditHook = () => {
-  const contacts = useSelector(getItemsList);
+  const contacts = useFetchContactsQuery();
   const params = useParams();
   const fields = !params?.id
     ? {

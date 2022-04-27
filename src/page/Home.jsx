@@ -1,6 +1,5 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { changeQuery, deleteContact } from 'redux/dataSelector';
-import { useDispatch } from 'react-redux';
 import { useHomeHook } from 'hooks/Hooks';
 import {
   Box,
@@ -14,13 +13,18 @@ import {
   Container,
 } from '@chakra-ui/react';
 import { MdContacts, MdEmail, MdPhoneInTalk } from 'react-icons/md';
+import { Spinner } from '@chakra-ui/react';
+import { useDeleteContactMutation } from 'redux/Reducers/contactsApi';
 
 export const Home = () => {
-  const dispatch = useDispatch();
-  const { filter, list } = useHomeHook();
+  const [filter, setFilter] = useState('');
+  console.log(filter);
+  const { list, isFetching } = useHomeHook(filter);
   const navigate = useNavigate();
 
   const onClickRouter = path => navigate(path);
+
+  const [deleteContact, { isLoading: isDeleting }] = useDeleteContactMutation();
 
   return (
     <>
@@ -79,70 +83,73 @@ export const Home = () => {
             pl={4}
             variant="flushed"
             defaultValue={`${filter}`}
-            onChange={e => {
-              dispatch(changeQuery(e.target.value.toLowerCase().trim()));
-            }}
+            onChange={e => setFilter(e.target.value.toLowerCase().trim())}
             placeholder="Input search name..."
           />
         </Box>
         <Box h="225px"></Box>
+
         <List spacing={5} w="100%">
-          {list.map(({ id, name, email, phone }) => {
-            return (
-              <ListItem
-                p="3"
-                w="100%"
-                key={id}
-                borderWidth="1px"
-                borderRadius="lg"
-                borderStyle="solid"
-              >
-                <List mb={3}>
-                  <ListItem>
-                    <ListIcon as={MdContacts} color="green.500" />
-                    <Text display="inline" pl={4}>
-                      {name}
-                    </Text>
-                  </ListItem>
-                  <ListItem>
-                    <ListIcon as={MdEmail} color="green.500" />
-                    <Text display="inline" pl={4}>
-                      {email}
-                    </Text>
-                  </ListItem>
-                  <ListItem>
-                    <ListIcon as={MdPhoneInTalk} color="green.500" />
-                    <Text display="inline" pl={4}>
-                      {phone}
-                    </Text>
-                  </ListItem>
-                </List>
-                <Box align="center" mb={1}>
-                  <Button
-                    width="100px"
-                    h={6}
-                    mr={4}
-                    colorScheme="blue"
-                    boxShadow="0px 10px 13px -7px #000000"
-                    variant="solid"
-                    onClick={() => onClickRouter(`edit/${id}`)}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    width="100px"
-                    h={6}
-                    colorScheme="pink"
-                    boxShadow="0px 10px 13px -7px #000000"
-                    variant="solid"
-                    onClick={() => dispatch(deleteContact(id))}
-                  >
-                    Delete
-                  </Button>
-                </Box>
-              </ListItem>
-            );
-          })}
+          {isFetching && <Spinner />}
+          {list &&
+            list.map(({ id, name, email, phone }) => {
+              return (
+                <ListItem
+                  p="3"
+                  w="100%"
+                  key={id}
+                  borderWidth="1px"
+                  borderRadius="lg"
+                  borderStyle="solid"
+                >
+                  <List mb={3}>
+                    <ListItem>
+                      <ListIcon as={MdContacts} color="green.500" />
+                      <Text display="inline" pl={4}>
+                        {name}
+                      </Text>
+                    </ListItem>
+                    <ListItem>
+                      <ListIcon as={MdEmail} color="green.500" />
+                      <Text display="inline" pl={4}>
+                        {email}
+                      </Text>
+                    </ListItem>
+                    <ListItem>
+                      <ListIcon as={MdPhoneInTalk} color="green.500" />
+                      <Text display="inline" pl={4}>
+                        {phone}
+                      </Text>
+                    </ListItem>
+                  </List>
+                  <Box align="center" mb={1}>
+                    <Button
+                      width="100px"
+                      h={6}
+                      mr={4}
+                      colorScheme="blue"
+                      boxShadow="0px 10px 13px -7px #000000"
+                      variant="solid"
+                      onClick={() => onClickRouter(`edit/${id}`)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      width="100px"
+                      h={6}
+                      colorScheme="pink"
+                      boxShadow="0px 10px 13px -7px #000000"
+                      variant="solid"
+                      onClick={() => deleteContact(id)}
+                      disabled={isDeleting}
+                    >
+                      {isDeleting && <Spinner size={12} />}
+                      Delete
+                    </Button>
+                  </Box>
+                </ListItem>
+              );
+            })}
         </List>
       </Container>
     </>

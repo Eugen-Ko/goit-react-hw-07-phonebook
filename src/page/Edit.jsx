@@ -22,16 +22,23 @@ import {
   Center,
 } from '@chakra-ui/react';
 import { MdContacts, MdEmail, MdPhoneInTalk } from 'react-icons/md';
+import { useFetchContactsQuery } from 'redux/Reducers/contactsApi';
 
 export const Edit = () => {
   const dispatch = useDispatch();
-  const contact = useSelector(getItemsList);
-  const filter = useSelector(getFilterQuery);
+  const contact = useFetchContactsQuery();
+  const filter = '';
   let navigate = useNavigate();
 
   const fields = useEditHook();
 
-  const { id, title, name, email, phone } = fields;
+  const {
+    id = '999',
+    title = 'add',
+    name = 'qqq',
+    email = 'qqq@qqq.qqq',
+    phone = '000-000-0000',
+  } = fields;
   return (
     <Flex justify="center" h="100vh" p={4}>
       <Box
@@ -196,17 +203,19 @@ export const Edit = () => {
                 </ListItem>
               </List>
               <Center>
-                <Button
-                  type="submit"
-                  width="100px"
-                  h={6}
-                  mr={4}
-                  colorScheme="blue"
-                  boxShadow="0px 10px 13px -7px #000000"
-                  variant="solid"
-                >
-                  Submit
-                </Button>
+                {contact && (
+                  <Button
+                    type="submit"
+                    width="100px"
+                    h={6}
+                    mr={4}
+                    colorScheme="blue"
+                    boxShadow="0px 10px 13px -7px #000000"
+                    variant="solid"
+                  >
+                    Submit
+                  </Button>
+                )}
                 <Button
                   width="100px"
                   h={6}
