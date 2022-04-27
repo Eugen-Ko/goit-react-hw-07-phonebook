@@ -1,30 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { useHomeHook } from 'hooks/Hooks';
-import {
-  Box,
-  Heading,
-  Button,
-  Input,
-  List,
-  ListItem,
-  ListIcon,
-  Text,
-  Container,
-} from '@chakra-ui/react';
-import { MdContacts, MdEmail, MdPhoneInTalk } from 'react-icons/md';
+import { Box, Heading, Button, Input, List, Container } from '@chakra-ui/react';
+
 import { Spinner } from '@chakra-ui/react';
-import { useDeleteContactMutation } from 'redux/Reducers/contactsApi';
+import { ContactListItem } from 'components/ContactListItem/ContactListItem';
 
 export const Home = () => {
   const [filter, setFilter] = useState('');
-  console.log(filter);
-  const { list, isFetching } = useHomeHook(filter);
   const navigate = useNavigate();
-
-  const onClickRouter = path => navigate(path);
-
-  const [deleteContact, { isLoading: isDeleting }] = useDeleteContactMutation();
+  const { list, isFetching } = useHomeHook(filter);
 
   return (
     <>
@@ -48,26 +34,22 @@ export const Home = () => {
           w="sm"
           p={4}
         >
-          <Box
+          <Heading
+            w="100%"
+            color="#5b0c9c"
+            size="lg"
+            fontSize="30px"
+            fontWeight="700"
+            align="center"
             mb={3}
             p={3}
-            w="100%"
             borderWidth="3px"
             borderRadius="lg"
             borderStyle="ridge"
             overflow="hidden"
           >
-            <Heading
-              w="100%"
-              color="#5b0c9c"
-              size="lg"
-              fontSize="30px"
-              fontWeight="700"
-              align="center"
-            >
-              PHONE BOOK
-            </Heading>
-          </Box>
+            PHONE BOOK
+          </Heading>
           <Button
             mb={3}
             colorScheme="teal"
@@ -75,7 +57,7 @@ export const Home = () => {
             borderWidth="1px"
             borderStyle="solid"
             variant="solid"
-            onClick={() => onClickRouter('/edit')}
+            onClick={() => navigate('/edit')}
           >
             Add contact...
           </Button>
@@ -92,64 +74,8 @@ export const Home = () => {
         <List spacing={5} w="100%">
           {isFetching && <Spinner />}
           {list &&
-            list.map(({ id, name, email, phone }) => {
-              return (
-                <ListItem
-                  p="3"
-                  w="100%"
-                  key={id}
-                  borderWidth="1px"
-                  borderRadius="lg"
-                  borderStyle="solid"
-                >
-                  <List mb={3}>
-                    <ListItem>
-                      <ListIcon as={MdContacts} color="green.500" />
-                      <Text display="inline" pl={4}>
-                        {name}
-                      </Text>
-                    </ListItem>
-                    <ListItem>
-                      <ListIcon as={MdEmail} color="green.500" />
-                      <Text display="inline" pl={4}>
-                        {email}
-                      </Text>
-                    </ListItem>
-                    <ListItem>
-                      <ListIcon as={MdPhoneInTalk} color="green.500" />
-                      <Text display="inline" pl={4}>
-                        {phone}
-                      </Text>
-                    </ListItem>
-                  </List>
-                  <Box align="center" mb={1}>
-                    <Button
-                      width="100px"
-                      h={6}
-                      mr={4}
-                      colorScheme="blue"
-                      boxShadow="0px 10px 13px -7px #000000"
-                      variant="solid"
-                      onClick={() => onClickRouter(`edit/${id}`)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      width="100px"
-                      h={6}
-                      colorScheme="pink"
-                      boxShadow="0px 10px 13px -7px #000000"
-                      variant="solid"
-                      onClick={() => deleteContact(id)}
-                      disabled={isDeleting}
-                    >
-                      {isDeleting && <Spinner size={12} />}
-                      Delete
-                    </Button>
-                  </Box>
-                </ListItem>
-              );
-            })}
+            !isFetching &&
+            list.map(list => <ContactListItem key={list.id} {...list} />)}
         </List>
       </Container>
     </>

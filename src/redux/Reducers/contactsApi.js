@@ -8,7 +8,7 @@ export const contactsApi = createApi({
   tagTypes: ['Contacts'],
   endpoints: builder => ({
     fetchContacts: builder.query({
-      query: () => '/contacts',
+      query: () => '/contacts?sortBy=name',
       providesTags: ['Contacts'],
     }),
     deleteContact: builder.mutation({
@@ -22,9 +22,15 @@ export const contactsApi = createApi({
       query: newContact => ({
         url: '/contacts',
         method: 'POST',
-        body: {
-          content: newContact,
-        },
+        body: newContact,
+      }),
+      invalidatesTags: ['Contacts'],
+    }),
+    editContact: builder.mutation({
+      query: editContact => ({
+        url: `/contacts/${editContact.id}`,
+        method: 'PUT',
+        body: editContact,
       }),
       invalidatesTags: ['Contacts'],
     }),
@@ -35,4 +41,5 @@ export const {
   useFetchContactsQuery,
   useDeleteContactMutation,
   useCreateContactMutation,
+  useEditContactMutation,
 } = contactsApi;

@@ -1,15 +1,7 @@
 import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useEditHook } from 'hooks/Hooks';
-import {
-  addContact,
-  editContact,
-  changeQuery,
-  getItemsList,
-  getFilterQuery,
-} from 'redux/dataSelector';
 import {
   Flex,
   Box,
@@ -22,23 +14,20 @@ import {
   Center,
 } from '@chakra-ui/react';
 import { MdContacts, MdEmail, MdPhoneInTalk } from 'react-icons/md';
-import { useFetchContactsQuery } from 'redux/Reducers/contactsApi';
+import {
+  useCreateContactMutation,
+  useEditContactMutation,
+} from 'redux/Reducers/contactsApi';
 
 export const Edit = () => {
-  const dispatch = useDispatch();
-  const contact = useFetchContactsQuery();
   const filter = '';
   let navigate = useNavigate();
+  const [createContact] = useCreateContactMutation();
+  const [editContact] = useEditContactMutation();
 
-  const fields = useEditHook();
+  const { fields, contacts, params } = useEditHook();
+  const { title, createdAt, id, name, email, phone } = fields;
 
-  const {
-    id = '999',
-    title = 'add',
-    name = 'qqq',
-    email = 'qqq@qqq.qqq',
-    phone = '000-000-0000',
-  } = fields;
   return (
     <Flex justify="center" h="100vh" p={4}>
       <Box
@@ -76,11 +65,11 @@ export const Edit = () => {
             if (!values.name) {
               errors.name = 'Required';
             } else if (
-              contact.filter(
+              contacts.filter(
                 ({ name }) =>
                   name.toLowerCase().trim() === values.name.toLowerCase().trim()
               ).length !== 0 &&
-              id === null
+              !params.id
             ) {
               errors.name = 'This name is already in the list';
             }
@@ -102,10 +91,9 @@ export const Edit = () => {
             return errors;
           }}
           onSubmit={(values, { setSubmitting }) => {
-            !id
-              ? dispatch(addContact(values))
-              : dispatch(editContact({ id, ...values }));
-            dispatch(changeQuery(''));
+            !params.id
+              ? createContact({ createdAt, id, ...values })
+              : editContact({ createdAt, id, ...values });
             navigate('/');
           }}
         >
@@ -203,7 +191,7 @@ export const Edit = () => {
                 </ListItem>
               </List>
               <Center>
-                {contact && (
+                {contacts && (
                   <Button
                     type="submit"
                     width="100px"
