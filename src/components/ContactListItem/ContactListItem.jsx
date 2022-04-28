@@ -6,7 +6,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 export const ContactListItem = ({ id, name, email, phone }) => {
-  console.log(id, name, email, phone);
   const [deleteContact, { isLoading, isSuccess }] = useDeleteContactMutation();
   const navigate = useNavigate();
   const location = useLocation();

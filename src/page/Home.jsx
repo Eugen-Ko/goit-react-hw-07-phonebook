@@ -11,7 +11,6 @@ export const Home = () => {
   const [filter, setFilter] = useState('');
   const navigate = useNavigate();
   const { list, isFetching, isLoading } = useHomeHook(filter);
-  console.log(list, isFetching, isLoading);
 
   return (
     <>

@@ -23,9 +23,8 @@ import toast from 'react-hot-toast';
 export const Edit = () => {
   const filter = '';
   let navigate = useNavigate();
-  const [createContact, { isLoading, isSuccess }] = useCreateContactMutation();
+  const [createContact] = useCreateContactMutation();
 
-  console.log(isLoading, isSuccess);
   const [editContact] = useEditContactMutation();
 
   const { fields, contacts, params } = useEditHook();
@@ -118,7 +117,6 @@ export const Edit = () => {
             <Form>
               <List>
                 {valuesForFields.map(({ icon, name, type, field }) => {
-                  console.log(name, type);
                   return (
                     <ListItem key={`${name}`}>
                       <Flex>
