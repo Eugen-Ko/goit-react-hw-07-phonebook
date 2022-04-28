@@ -6,10 +6,9 @@ import { nanoid } from 'nanoid';
 //------------------------------------------------------------------
 
 export const useHomeHook = filter => {
-  const [list, setList] = useState([]);
+  const [list, setList] = useState(null);
   const navigate = useNavigate();
-
-  const { data: contacts, isFetching } = useFetchContactsQuery();
+  const { data: contacts, isFetching, isLoading } = useFetchContactsQuery();
   useEffect(() => {
     filter !== ''
       ? setList(
@@ -21,7 +20,7 @@ export const useHomeHook = filter => {
   useEffect(() => {
     filter !== '' ? navigate(`?query=${filter}`) : navigate(`/`);
   }, [filter, navigate]);
-  return { list, isFetching };
+  return { list, isFetching, isLoading };
 };
 
 //-------------------------------------------------------------------
@@ -29,7 +28,6 @@ export const useHomeHook = filter => {
 export const useEditHook = () => {
   const params = useParams();
   const { data: contacts } = useFetchContactsQuery();
-  console.log(contacts);
   const fields = !params?.id
     ? {
         createdAt: new Date().toISOString(),

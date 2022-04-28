@@ -18,15 +18,24 @@ import {
   useCreateContactMutation,
   useEditContactMutation,
 } from 'redux/Reducers/contactsApi';
+import toast from 'react-hot-toast';
 
 export const Edit = () => {
   const filter = '';
   let navigate = useNavigate();
-  const [createContact] = useCreateContactMutation();
+  const [createContact, { isLoading, isSuccess }] = useCreateContactMutation();
+
+  console.log(isLoading, isSuccess);
   const [editContact] = useEditContactMutation();
 
   const { fields, contacts, params } = useEditHook();
   const { title, createdAt, id, name, email, phone } = fields;
+
+  const valuesForFields = [
+    { icon: MdContacts, name: 'name', type: 'name', field: name },
+    { icon: MdEmail, name: 'email', type: 'email', field: email },
+    { icon: MdPhoneInTalk, name: 'phone', type: 'text', field: phone },
+  ];
 
   return (
     <Flex justify="center" h="100vh" p={4}>
@@ -43,7 +52,6 @@ export const Edit = () => {
           mb={5}
           p={2}
           w="100%"
-          // h="70px"
           borderWidth="3px"
           borderRadius="lg"
           borderStyle="ridge"
@@ -91,119 +99,71 @@ export const Edit = () => {
             return errors;
           }}
           onSubmit={(values, { setSubmitting }) => {
-            !params.id
-              ? createContact({ createdAt, id, ...values })
-              : editContact({ createdAt, id, ...values });
+            if (!params.id) {
+              createContact({
+                createdAt,
+                id,
+                ...values,
+              });
+              toast.success(`Contact ${values.name} was create.`);
+            } else {
+              editContact({ createdAt, id, ...values });
+              toast.success(`Contact ${values.name} was edit.`);
+            }
+
             navigate('/');
           }}
         >
           {({ isSubmitting }) => (
             <Form>
               <List>
-                <ListItem>
-                  <Flex>
-                    <ListIcon
-                      as={MdContacts}
-                      color="green.500"
-                      m="12px auto auto auto"
-                    />
-                    <Field
-                      as={Input}
-                      bg="#fffdde"
-                      variant="flushed"
-                      m="0 0 5px 16px"
-                      p={2}
-                      type="name"
-                      name="name"
-                      placeholder={`${name}`}
-                    />
-                  </Flex>
-                  <Box
-                    fontSize="13px"
-                    align="center"
-                    w="100%"
-                    h={5}
-                    color="red"
-                    mb={3}
-                  >
-                    <ErrorMessage name="name" />
-                  </Box>
-                </ListItem>
-                <ListItem>
-                  <Flex>
-                    <ListIcon
-                      as={MdEmail}
-                      color="green.500"
-                      m="12px auto auto auto"
-                    />
-
-                    <Field
-                      as={Input}
-                      bg="#fffdde"
-                      variant="flushed"
-                      m="0 0 5px 16px"
-                      p={2}
-                      type="email"
-                      name="email"
-                      placeholder={`${email}`}
-                    />
-                  </Flex>
-                  <Box
-                    fontSize="13px"
-                    align="center"
-                    w="100%"
-                    h={5}
-                    color="red"
-                    mb={3}
-                  >
-                    <ErrorMessage name="email" />
-                  </Box>
-                </ListItem>{' '}
-                <ListItem>
-                  <Flex>
-                    <ListIcon
-                      as={MdPhoneInTalk}
-                      color="green.500"
-                      m="12px auto auto auto"
-                    />
-
-                    <Field
-                      as={Input}
-                      bg="#fffdde"
-                      variant="flushed"
-                      m="0 0 5px 16px"
-                      p={2}
-                      type="text"
-                      name="phone"
-                      placeholder={`${phone}`}
-                    />
-                  </Flex>
-                  <Box
-                    fontSize="13px"
-                    align="center"
-                    w="100%"
-                    h={5}
-                    color="red"
-                    mb={3}
-                  >
-                    <ErrorMessage name="phone" />
-                  </Box>
-                </ListItem>
+                {valuesForFields.map(({ icon, name, type, field }) => {
+                  console.log(name, type);
+                  return (
+                    <ListItem key={`${name}`}>
+                      <Flex>
+                        <ListIcon
+                          as={icon}
+                          color="green.500"
+                          m="12px auto auto auto"
+                        />
+                        <Field
+                          as={Input}
+                          bg="#fffdde"
+                          variant="flushed"
+                          m="0 0 5px 16px"
+                          p={2}
+                          type={`${type}`}
+                          name={`${name}`}
+                          placeholder={`${field}`}
+                        />
+                      </Flex>
+                      <Box
+                        fontSize="13px"
+                        align="center"
+                        w="100%"
+                        h={5}
+                        color="red"
+                        mb={3}
+                      >
+                        <ErrorMessage name={`${name}`} />
+                      </Box>
+                    </ListItem>
+                  );
+                })}
               </List>
               <Center>
-                {contacts && (
-                  <Button
-                    type="submit"
-                    width="100px"
-                    h={6}
-                    mr={4}
-                    colorScheme="blue"
-                    boxShadow="0px 10px 13px -7px #000000"
-                    variant="solid"
-                  >
-                    Submit
-                  </Button>
-                )}
+                <Button
+                  type="submit"
+                  width="100px"
+                  h={6}
+                  mr={4}
+                  colorScheme="blue"
+                  boxShadow="0px 10px 13px -7px #000000"
+                  variant="solid"
+                >
+                  Submit
+                </Button>
                 <Button
                   width="100px"
                   h={6}

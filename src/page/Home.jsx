@@ -10,7 +10,8 @@ import { ContactListItem } from 'components/ContactListItem/ContactListItem';
 export const Home = () => {
   const [filter, setFilter] = useState('');
   const navigate = useNavigate();
-  const { list, isFetching } = useHomeHook(filter);
+  const { list, isFetching, isLoading } = useHomeHook(filter);
+  console.log(list, isFetching, isLoading);
 
   return (
     <>
@@ -75,6 +76,7 @@ export const Home = () => {
           {isFetching && <Spinner />}
           {list &&
             !isFetching &&
+            !isLoading &&
             list.map(list => <ContactListItem key={list.id} {...list} />)}
         </List>
       </Container>

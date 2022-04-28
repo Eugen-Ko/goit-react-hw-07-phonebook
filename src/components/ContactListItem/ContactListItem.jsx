@@ -3,11 +3,18 @@ import { MdContacts, MdEmail, MdPhoneInTalk } from 'react-icons/md';
 import { useDeleteContactMutation } from 'redux/Reducers/contactsApi';
 import { Spinner } from '@chakra-ui/react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 export const ContactListItem = ({ id, name, email, phone }) => {
-  const [deleteContact, { isLoading: isDeleting }] = useDeleteContactMutation();
+  console.log(id, name, email, phone);
+  const [deleteContact, { isLoading, isSuccess }] = useDeleteContactMutation();
   const navigate = useNavigate();
   const location = useLocation();
+  const valuesForFields = [
+    { icon: MdContacts, field: name },
+    { icon: MdEmail, field: email },
+    { icon: MdPhoneInTalk, field: phone },
+  ];
   return (
     <ListItem
       p="3"
@@ -18,25 +25,18 @@ export const ContactListItem = ({ id, name, email, phone }) => {
       borderStyle="solid"
     >
       <List mb={3}>
-        <ListItem>
-          <ListIcon as={MdContacts} color="green.500" />
-          <Text display="inline" pl={4}>
-            {name}
-          </Text>
-        </ListItem>
-        <ListItem>
-          <ListIcon as={MdEmail} color="green.500" />
-          <Text display="inline" pl={4}>
-            {email}
-          </Text>
-        </ListItem>
-        <ListItem>
-          <ListIcon as={MdPhoneInTalk} color="green.500" />
-          <Text display="inline" pl={4}>
-            {phone}
-          </Text>
-        </ListItem>
+        {valuesForFields.map(({ icon, field }) => {
+          return (
+            <ListItem key={`${field}`}>
+              <ListIcon as={icon} color="green.500" />
+              <Text display="inline" pl={4}>
+                {field}
+              </Text>
+            </ListItem>
+          );
+        })}
       </List>
+
       <Box align="center" mb={1}>
         <Button
           width="100px"
@@ -58,10 +58,13 @@ export const ContactListItem = ({ id, name, email, phone }) => {
           colorScheme="pink"
           boxShadow="0px 10px 13px -7px #000000"
           variant="solid"
-          onClick={() => deleteContact(id)}
-          disabled={isDeleting}
+          onClick={() => {
+            deleteContact(id);
+            !isSuccess && toast.success('Contact was delete');
+          }}
+          disabled={isLoading}
         >
-          {isDeleting && <Spinner size={12} />}
+          {isLoading && <Spinner size={12} />}
           Delete
         </Button>
       </Box>
