@@ -59,7 +59,7 @@ export const ContactListItem = ({ id, name, email, phone }) => {
           variant="solid"
           onClick={() => {
             deleteContact(id);
-            !isSuccess && toast.success('Contact was delete');
+            !isSuccess && toast.success(`Contact ${name} was delete`);
           }}
           disabled={isLoading}
         >
